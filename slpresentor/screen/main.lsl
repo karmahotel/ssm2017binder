@@ -33,6 +33,10 @@ default
             {
                 password = llList2Integer(values,1);
             }
+            else if ( command == "reset" )
+            {
+                llResetScript();
+            }
         }
         else
         {
