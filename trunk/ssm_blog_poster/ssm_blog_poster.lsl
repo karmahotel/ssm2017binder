@@ -48,11 +48,11 @@ integer menu_channel;
 key owner;
 // format the body
 string get_body() {
-    return "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><methodCall><methodName>blogger.newPost</methodName><params>"
+    return "<?xml version=\"1.0\"?><methodCall><methodName>blogger.newPost</methodName><params>"
     + "<param><value><string/></value></param><param><value><string/></value></param>"
     + "<param><value><string>"+ username+ "</string></value></param>"
     + "<param><value><string>"+ password+ "</string></value></param>"
-    + "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;&#60;category&#62;"+ categories+ "&#60;/category&#62;"+ body+ "</string></value></param>"
+    + "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;&#60;category&#62;"+ categories+ "&#60;/category&#62;<![CDATA["+ body+ "]]></string></value></param>"
     + "<param><value><int>"+ status+ "</int></value></param>"
     + "</params></methodCall>";
 }
