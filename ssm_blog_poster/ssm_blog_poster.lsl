@@ -31,18 +31,24 @@ string _PUBLISH_STATUS = "Publish status";
 string _BODY = "Body";
 string _POST = "Post";
 string _REQUEST_TIMED_OUT = "Request timed out";
+string _FORBIDEN_ACCESS = "Forbiden access";
+string _PAGE_NOT_FOUND = "Page not found";
 string _INTERNET_EXPLODED = "the internet exploded!!";
 string _POST_SUCCEDED = "Post succeded";
 string _POST_ID = "Post id";
 string _POST_FAILED = "Post failed";
 string _SERVER_ANSWERED = "Server answered";
+// =============== //
+//   default params       //
+// =============== //
+string title;
+string categories = "1";
+string status = "1";
+integer use_nl = TRUE;
 // *********************************************** //
 //    NOTHING SHOULD BE CHANGED UNDER THIS LINE     //
 // *********************************************** //
-string title;
 string body;
-string categories = "1";
-string status = "1";
 integer menu_listener;
 integer menu_channel;
 key owner;
@@ -194,7 +200,12 @@ state read_notecard
                     status = data;
                 }
                 if (i_line >2) {
-                    body += data+ "\n";
+                    if (use_nl) {
+                        body += data+ "\n";
+                    }
+                    else {
+                        body += data;
+                    }
                 }
                 notecard_id = llGetNotecardLine(notecard_name,++i_line);
             }
@@ -269,7 +280,13 @@ state post {
         if (status == 499) {
             llOwnerSay(_REQUEST_TIMED_OUT);
         }
-        else if (status != 200) {
+        else if (status != 403) {
+            llOwnerSay(_FORBIDEN_ACCES);
+        }
+        else if (status != 404) {
+            llOwnerSay(_PAGE_NOT_FOUND);
+        }
+        else if (status != 200 && status != 403 && status != 404) {
             llOwnerSay(_INTERNET_EXPLODED);
         }
         else {
