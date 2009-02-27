@@ -280,10 +280,10 @@ state post {
         if (status == 499) {
             llOwnerSay(_REQUEST_TIMED_OUT);
         }
-        else if (status != 403) {
+        else if (status == 403) {
             llOwnerSay(_FORBIDEN_ACCESS);
         }
-        else if (status != 404) {
+        else if (status == 404) {
             llOwnerSay(_PAGE_NOT_FOUND);
         }
         else if (status != 200 && status != 403 && status != 404) {
