@@ -281,7 +281,7 @@ state post {
             llOwnerSay(_REQUEST_TIMED_OUT);
         }
         else if (status != 403) {
-            llOwnerSay(_FORBIDEN_ACCES);
+            llOwnerSay(_FORBIDEN_ACCESS);
         }
         else if (status != 404) {
             llOwnerSay(_PAGE_NOT_FOUND);
