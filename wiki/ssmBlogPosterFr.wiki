@@ -87,7 +87,7 @@ Actuellement les variables sont :
   * definition : permet de personnaliser le mot qui sert a separer la configuration du corps de l'article dans la notecard.
   * valeur par defaut : "<!--body-->"
 
-== exemples de notecard ==
+= exemples de notecard =
 
 {{{
 title = Mon Titre depuis sl pour wordpress
