@@ -87,7 +87,7 @@ Actuallay, the variables are :
   * definition : gives you the ability to custom the word that will separate the config from the content in the notecard.
   * default value : "<!--body-->"
 
-== notecard examples ==
+= notecard examples =
 
 {{{
 title = My title from sl for wordpress
