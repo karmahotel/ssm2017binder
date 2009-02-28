@@ -47,7 +47,7 @@ string _SERVER_ANSWERED = "Server answered";
 //   default params       //
 // =============== //
 string title;
-string categories = "1";
+string categories = "0";
 string publish_status = "1";
 integer use_nl = TRUE;
 string body_separator = "<!--body-->";
