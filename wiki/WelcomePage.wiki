@@ -18,4 +18,4 @@ Voici le weiki pour vous aider a utiliser mes scripts.
 Choisissez une page pour commencer :
 
   * slpresentor ( pas encore de wiki )
-  * [WikiSyntax ssmBlogPoster en francais]
+  * [ssmBlogPosterFr ssmBlogPoster en francais]
