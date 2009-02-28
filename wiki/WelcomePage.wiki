@@ -1,0 +1,21 @@
+#labels Featured
+Hello and welcome
+
+Here is the wiki to help you to use my scripts.
+
+Choose a page to begin :
+
+  * slpresentor ( no wiki yet )
+  * [WikiSyntax ssmBlogPoster in English]
+
+
+=======================================================================
+
+Bonjour et bienvenue
+
+Voici le weiki pour vous aider a utiliser mes scripts.
+
+Choisissez une page pour commencer :
+
+  * slpresentor ( pas encore de wiki )
+  * [WikiSyntax ssmBlogPoster en francais]
