@@ -10,10 +10,12 @@
 string username = "";
 string password = "";
 string url = "";
+string cms = "wordpress"; // use joomla or drupal or wordpress
 // =============== //
 //   strings       //
 // =============== //
 string _BLOG_POSTER_READY = "Blog poster ready";
+string _SCRIPT_WILL_STOP = "Script will stop";
 // menu
 string _CHOOSE_AN_OPTION = "Choose an option";
 string _RESET = "Reset";
@@ -23,6 +25,9 @@ string _NO_NOTECARD_WAS_FOUND = "No notecard was found";
 // notecard reading
 string _START_READING_THE_NOTECARD = "Start reading the notecard";
 string _NOTECARD_READ = "Notecard read";
+string _NO_BODY_DEFINED = "No body defined";
+string _THE_TAG = "The tag";
+string _IS_MISSING = "is missing";
 // post
 string _DO_YOU_REALLY_WANT_TO_POST_THIS_MESSAGE = "Do you really want to post this message ?";
 string _TITLE = "Title";
@@ -43,24 +48,83 @@ string _SERVER_ANSWERED = "Server answered";
 // =============== //
 string title;
 string categories = "1";
-string status = "1";
+string publish_status = "1";
 integer use_nl = TRUE;
+string body_separator = "<!--body-->";
+string drupal_content_type = "blog";
 // *********************************************** //
 //    NOTHING SHOULD BE CHANGED UNDER THIS LINE     //
 // *********************************************** //
+// read config data
+read_config(string data) {
+    list parsed = llParseString2List( data, [ "=" ], [] );
+    string param = llToLower(llStringTrim(llList2String( parsed, 0 ), STRING_TRIM));
+    string value = llStringTrim(llList2String( parsed, 1 ), STRING_TRIM);
+    if (param != "") {
+        if (param == "url") {
+            url = value;
+        }
+        else if (param == "username") {
+            username = value;
+        }
+        else if (param == "password") {
+            password = value;
+        }
+        else if (param == "cms") {
+            cms = value;
+        }
+        else if (param == "drupal_content_type") {
+            drupal_content_type = value;
+        }
+        else if (param == "publish_status") {
+            publish_status = value;
+        }
+        else if (param == "categories") {
+            categories = value;
+        }
+        else if (param == "title") {
+            title = value;
+        }
+        else if (param == "body_separator") {
+            body_separator = value;
+        }
+        else if (param == "use_nl") {
+            use_nl = (integer)value;
+        }
+    }
+}
 string body;
 integer menu_listener;
 integer menu_channel;
 key owner;
 // format the body
 string get_body() {
-    return "<?xml version=\"1.0\"?><methodCall><methodName>blogger.newPost</methodName><params>"
-    + "<param><value><string/></value></param><param><value><string/></value></param>"
-    + "<param><value><string>"+ username+ "</string></value></param>"
-    + "<param><value><string>"+ password+ "</string></value></param>"
-    + "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;&#60;category&#62;"+ categories+ "&#60;/category&#62;<![CDATA["+ body+ "]]></string></value></param>"
-    + "<param><value><int>"+ status+ "</int></value></param>"
-    + "</params></methodCall>";
+    // common values
+    string credentials = "<param><value><string>"+ username+ "</string></value></param>"
+                                  + "<param><value><string>"+ password+ "</string></value></param>";
+    string output = "<?xml version=\"1.0\"?><methodCall><methodName>blogger.newPost</methodName><params>";
+    // get values for wordpress
+    if (cms == "wordpress") {
+        output += "<param><value><string/></value></param><param><value><string/></value></param>";
+        output += credentials;
+        output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;&#60;category&#62;"+ categories+ "&#60;/category&#62;<![CDATA["+ body+ "]]></string></value></param>";
+    }
+    // get values for drupal
+    else if (cms == "drupal") {
+        output += "<param><value><string/></value></param><param><value><string>"+ drupal_content_type+ "</string></value></param>";
+        output += credentials;
+        output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;<![CDATA["+ body+ "]]></string></value></param>";
+    }
+    // get values for joomla
+    else if (cms == "joomla") {
+        output += "<param><value><string/></value></param><param><value><string>"+ llGetSubString(categories, 0, 1)+ "</string></value></param>";
+        output += credentials;
+        output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;<![CDATA["+ body+ "]]></string></value></param>";
+    }
+    // close the message
+    output += "<param><value><boolean>"+ publish_status+ "</boolean></value></param>"
+                + "</params></methodCall>";
+    return output;
 }
 key reqid;
 // delete inventory content
@@ -86,17 +150,31 @@ delete_content(integer delete_notecard) {
 }
 // get the answer
 get_site_answer(string body) {
-  list values = llParseString2List(body, ["/>","<", ">"], []);
-  string output = "";
-  if (llList2String(values, 10) == "int") {
-      string id = llList2String(values, 11);
-      llOwnerSay(_POST_SUCCEDED+ " "+ _POST_ID+ " = "+ id);
-      llOwnerSay(url+ "/?p="+ id);
-      llLoadURL(owner, title, url+"/?p="+ id);
-  }
-  else {
-    llOwnerSay(_POST_FAILED+ " : "+ _SERVER_ANSWERED+ body);
-  }
+    list data = llParseString2List(body, ["/>","<", ">"], []);
+    string output = "";
+    integer success = FALSE;
+    llOwnerSay(llList2CSV(data));
+    if (cms == "wordpress") {
+        display_answer(data, 27, 32, 11, "/?p=");
+    }
+    else if (cms == "drupal") {
+        display_answer(data, 27, 32, 10, "/?q=");
+    }
+    else if (cms == "joomla") {
+        display_answer(data, 25, 30, 10, "/index.php?option=com_content&view=article&id=");
+    }
+}
+// display answer from server
+display_answer(list data, integer error_idx, integer msg_idx, integer id_idx, string url_str) {
+    if (llList2String(data, error_idx) == "faultString") {
+        llOwnerSay(_POST_FAILED+ " \n"+ _SERVER_ANSWERED+ " : "+ llList2String(data, msg_idx));
+    }
+    else {
+        string id = llList2String(data, id_idx);
+        llOwnerSay(_POST_SUCCEDED+ " "+ _POST_ID+ " = "+ id);
+        llOwnerSay(url+ url_str+ id);
+        llLoadURL(owner, title, url+ url_str+ id);
+    }
 }
 // ********************** //
 //    WAIT FOR NOTECARD   //
@@ -104,6 +182,7 @@ get_site_answer(string body) {
 string notecard_name;
 integer i_line;
 key notecard_id;
+integer config_values = TRUE;
 default
 {
     state_entry()
@@ -156,8 +235,9 @@ state read_notecard
     {
         // read the config notecard
         i_line=0;
-        notecard_id = llGetNotecardLine(notecard_name,i_line);
+        config_values = TRUE;
         body = "";
+        notecard_id = llGetNotecardLine(notecard_name,i_line);
         llOwnerSay(_START_READING_THE_NOTECARD);
     }
     touch_start(integer total_number)
@@ -187,19 +267,16 @@ state read_notecard
             {
                 // remove trailing spaces
                 data = llStringTrim(data, STRING_TRIM);
-                // get the tile
-                if (i_line == 0) {
-                    title = data;
+                // check config values
+                if (config_values == TRUE) {
+                    if (data != body_separator) {
+                        read_config(data);
+                    }
+                    else {
+                        config_values = FALSE;
+                    }
                 }
-                // get the categories ids
-                if (i_line == 1) {
-                    categories = data;
-                }
-                // get the post status
-                if (i_line == 2) {
-                    status = data;
-                }
-                if (i_line >2) {
+                else {
                     if (use_nl) {
                         body += data+ "\n";
                     }
@@ -211,10 +288,18 @@ state read_notecard
             }
             else
             {
-                llOwnerSay(_NOTECARD_READ);
-                // deleting the notecard
-                llRemoveInventory(notecard_name);
-                state post;
+                if (config_values == TRUE) {
+                    llOwnerSay(_NO_BODY_DEFINED);
+                    llOwnerSay(_THE_TAG+ " "+ body_separator+ " "+ _IS_MISSING);
+                    llOwnerSay(_SCRIPT_WILL_STOP);
+                    state default;
+                }
+                else {
+                    llOwnerSay(_NOTECARD_READ);
+                    // deleting the notecard
+                    llRemoveInventory(notecard_name);
+                    state post;
+                }
             }
         }
     }
@@ -245,8 +330,7 @@ state post {
         }
         string menu_content = _DO_YOU_REALLY_WANT_TO_POST_THIS_MESSAGE+ "\n"
             + _TITLE+ " = "+ title+ "\n"
-            + _CATEGORIES+ " = "+ categories+ "\n"
-            + _PUBLISH_STATUS+ " = "+ status+ "\n"
+            + _PUBLISH_STATUS+ " = "+ publish_status+ "\n"
             + _BODY+ " = "+ preview_body;
         menu_listener = llListen(menu_channel,"", owner,"");
         llDialog(owner, menu_content, [_RESET, _POST], menu_channel);
@@ -268,7 +352,11 @@ state post {
                 llResetScript();
             }
             else if (message == _POST) {
-                reqid = llHTTPRequest( url+"/xmlrpc.php", [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], get_body() );
+                string url2 = url+"/xmlrpc.php";
+                if (cms == "joomla") {
+                    url2 = url+ "/xmlrpc/index.php";
+                }
+                reqid = llHTTPRequest( url2, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], get_body() );
             }
             llListenRemove(menu_listener);
         }
