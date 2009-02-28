@@ -51,7 +51,7 @@ string categories = "1";
 string publish_status = "1";
 integer use_nl = TRUE;
 string body_separator = "<!--body-->";
-string drupal_content_type = "blog";
+string content_type = "blog";
 // *********************************************** //
 //    NOTHING SHOULD BE CHANGED UNDER THIS LINE     //
 // *********************************************** //
@@ -73,8 +73,8 @@ read_config(string data) {
         else if (param == "cms") {
             cms = value;
         }
-        else if (param == "drupal_content_type") {
-            drupal_content_type = value;
+        else if (param == "content_type") {
+            content_type = value;
         }
         else if (param == "publish_status") {
             publish_status = value;
@@ -111,7 +111,7 @@ string get_body() {
     }
     // get values for drupal
     else if (cms == "drupal") {
-        output += "<param><value><string/></value></param><param><value><string>"+ drupal_content_type+ "</string></value></param>";
+        output += "<param><value><string/></value></param><param><value><string>"+ content_type+ "</string></value></param>";
         output += credentials;
         output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;<![CDATA["+ body+ "]]></string></value></param>";
     }
