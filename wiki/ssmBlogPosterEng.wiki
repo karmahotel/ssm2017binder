@@ -81,7 +81,8 @@ Actuallay, the variables are :
     * TRUE or 1 : the article will be published
     * FALSE or 0 : the article will not be published
 === use_nl ===
-  * definition : allow you to choose if we are using new lines for every line of the notecard or if we are using html tags for new lines.  * possible values : TRUE or FALSE or bien 1 or 0
+  * definition : allow you to choose if we are using new lines for every line of the notecard or if we are using html tags for new lines.
+  * possible values : TRUE or FALSE or bien 1 or 0
 === body_separator ===
   * definition : gives you the ability to custom the word that will separate the config from the content in the notecard.
   * default value : "<!--body-->"
