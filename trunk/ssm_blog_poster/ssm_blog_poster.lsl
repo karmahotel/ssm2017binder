@@ -153,7 +153,6 @@ get_site_answer(string body) {
     list data = llParseString2List(body, ["/>","<", ">"], []);
     string output = "";
     integer success = FALSE;
-    llOwnerSay(llList2CSV(data));
     if (cms == "wordpress") {
         display_answer(data, 27, 32, 11, "/?p=");
     }
