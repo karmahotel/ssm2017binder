@@ -11,9 +11,9 @@ To make it work, you need to add this script in a box, and create a notecard.
 
 Then you need to fill the 3 first variables in the script :
 
-    * username ( the username on the site )
-    * password ( the password of this username on the site )
-    * url ( the address of your website. ex : http://monsite.com/wordpress
+  * username ( the username on the site )
+  * password ( the password of this username on the site )
+  * url ( the address of your website. ex : http://monsite.com/wordpress
 
 During the creation of the notecard, you can change these values ( but when changing values by notecard, the values set stay in place, so you need to reset the script to go back to the default values )
 Click on the object to make the rest menu appear.
@@ -34,9 +34,8 @@ Go to the page : wp-admin/options-writing.php and activate it.
  * Install the module called : blogapi
  * go to admin/settings/blogapi and choose the content type to use
 === activation for joomla ===
-Go to the config page : administrator/index.php?option=com_config and activate "web services"
-
-Go to the plugins list : administrator/index.php?option=com_plugins&client=site and publish the plugin named : XML-RPC - Blogger API
+ * Go to the config page : administrator/index.php?option=com_config and activate "web services"
+ * Go to the plugins list : administrator/index.php?option=com_plugins&client=site and publish the plugin named : XML-RPC - Blogger API
 
 = script configuration =
 You can define variables by default in the script or you can add them in the notecard that you will use for the article.
