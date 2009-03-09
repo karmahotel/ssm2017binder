@@ -34,7 +34,8 @@ Pour wordpress ca se trouve sur la page : wp-admin/options-writing.php
  * Installer le module qui se nomme : blogapi
  * aller dans admin/settings/blogapi et choisir le type de contenu à utiliser
 === activation pour joomla ===
-Aller sur la page de config : administrator/index.php?option=com_config et activer les "web services"
+  * Aller sur la page de config : administrator/index.php?option=com_config et activer les "web services"
+  * Aller dans la liste des plugins : administrator/index.php?option=com_plugins&client=site et publier le plugin : XML-RPC - Blogger API
 
 = configuration du script =
 Vous pouvez definir des variables par defaut dans le script ou bien les mettre dans la notecard qui vous servira pour l'article.
