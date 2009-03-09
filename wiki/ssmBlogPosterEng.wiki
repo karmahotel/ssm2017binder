@@ -35,6 +35,7 @@ Go to the page : wp-admin/options-writing.php and activate it.
  * go to admin/settings/blogapi and choose the content type to use
 === activation for joomla ===
 Go to the config page : administrator/index.php?option=com_config and activate "web services"
+Go to the plugins list : administrator/index.php?option=com_plugins&client=site and publish the plugin named : XML-RPC - Blogger API
 
 = script configuration =
 You can define variables by default in the script or you can add them in the notecard that you will use for the article.
