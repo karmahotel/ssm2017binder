@@ -35,14 +35,16 @@ string _CATEGORIES = "Categories";
 string _PUBLISH_STATUS = "Publish status";
 string _BODY = "Body";
 string _POST = "Post";
-string _REQUEST_TIMED_OUT = "Request timed out";
-string _FORBIDEN_ACCESS = "Forbiden access";
-string _PAGE_NOT_FOUND = "Page not found";
-string _INTERNET_EXPLODED = "the internet exploded!!";
-string _POST_SUCCEDED = "Post succeded";
+string _POST_SUCCEEDED = "Post succeeded";
 string _POST_ID = "Post id";
 string _POST_FAILED = "Post failed";
 string _SERVER_ANSWERED = "Server answered";
+// http errors
+string _REQUEST_TIMED_OUT = "Request timed out";
+string _FORBIDDEN_ACCESS = "Forbidden access";
+string _PAGE_NOT_FOUND = "Page not found";
+string _INTERNET_EXPLODED = "the internet exploded!!";
+string _SERVER_ERROR = "Server error";
 // =============== //
 //   default params       //
 // =============== //
@@ -170,9 +172,28 @@ display_answer(list data, integer error_idx, integer msg_idx, integer id_idx, st
     }
     else {
         string id = llList2String(data, id_idx);
-        llOwnerSay(_POST_SUCCEDED+ " "+ _POST_ID+ " = "+ id);
+        llOwnerSay(_POST_SUCCEEDED+ " "+ _POST_ID+ " = "+ id);
         llOwnerSay(url+ url_str+ id);
         llLoadURL(owner, title, url+ url_str+ id);
+    }
+}
+// get server answer
+getServerAnswer(integer status, string body) {
+    if (status == 499) {
+        llOwnerSay((string)status+ " "+ _REQUEST_TIMED_OUT);
+    }
+    else if (status == 403) {
+        llOwnerSay((string)status+ " "+ _FORBIDDEN_ACCESS);
+    }
+    else if (status == 404) {
+        llOwnerSay((string)status+ " "+ _PAGE_NOT_FOUND);
+    }
+    else if (status == 500) {
+        llOwnerSay((string)status+ " "+ _SERVER_ERROR);
+    }
+    else if (status != 403 && status != 404 && status != 500) {
+        llOwnerSay((string)status+ " "+ _INTERNET_EXPLODED);
+        llOwnerSay(body);
     }
 }
 // ********************** //
@@ -364,17 +385,8 @@ state post {
         if (id != reqid) {
             return;
         }
-        if (status == 499) {
-            llOwnerSay(_REQUEST_TIMED_OUT);
-        }
-        else if (status == 403) {
-            llOwnerSay(_FORBIDEN_ACCESS);
-        }
-        else if (status == 404) {
-            llOwnerSay(_PAGE_NOT_FOUND);
-        }
-        else if (status != 200 && status != 403 && status != 404) {
-            llOwnerSay(_INTERNET_EXPLODED);
+        if (status != 200) {
+            getServerAnswer(status, body);
         }
         else {
             get_site_answer(body);
