@@ -124,7 +124,7 @@ password = monpass
 content_type = blog
 <!--body-->
 Voici l'en tete de mon article
-<!--extended-->
+<!--break-->
 et voci le contenu de l'article
 }}}
 
