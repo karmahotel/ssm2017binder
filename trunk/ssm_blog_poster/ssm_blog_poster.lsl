@@ -159,7 +159,7 @@ get_site_answer(string body) {
         display_answer(data, 27, 32, 11, "/?p=");
     }
     else if (cms == "drupal") {
-        display_answer(data, 27, 32, 10, "/?q=");
+        display_answer(data, 27, 32, 10, "/?q=node/");
     }
     else if (cms == "joomla") {
         display_answer(data, 25, 30, 10, "/index.php?option=com_content&view=article&id=");
