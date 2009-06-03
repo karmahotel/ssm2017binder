@@ -33,6 +33,7 @@ Pour wordpress ca se trouve sur la page : wp-admin/options-writing.php
 === activation pour drupal ===
  * Installer le module qui se nomme : blogapi
  * aller dans admin/settings/blogapi et choisir le type de contenu à utiliser
+ * aller dans admin/user/permissions et activer "administrer les contributions via le Blog API" pour le rôle utilisateur désiré
 === activation pour joomla ===
   * Aller sur la page de config : administrator/index.php?option=com_config et activer les "web services"
   * Aller dans la liste des plugins : administrator/index.php?option=com_plugins&client=site et publier le plugin : XML-RPC - Blogger API
