@@ -5,7 +5,7 @@ Here is the wiki to help you to use my scripts.
 
 Choose a page to begin :
 
-  * slpresentor ( no wiki yet )
+  * [SlPresentorEng slpresentor in English]
   * [ssmBlogPosterEng ssmBlogPoster in English]
 
 
