@@ -99,34 +99,61 @@ string body;
 integer menu_listener;
 integer menu_channel;
 key owner;
+// build the header
+string header = "<?xml version=\"1.0\"?><methodCall><methodName>blogger.newPost</methodName><params>";
+string build_credentials() {
+    return "<param><value><string>"+ username+ "</string></value></param>"
+            +"<param><value><string>"+ password+ "</string></value></param>";
+}
+string build_footer() {
+    return "<param><value><boolean>"+ publish_status+ "</boolean></value></param>"
+            + "</params></methodCall>";
+}
 // format the body
 string get_body() {
-    // common values
-    string credentials = "<param><value><string>"+ username+ "</string></value></param>"
-                                  + "<param><value><string>"+ password+ "</string></value></param>";
-    string output = "<?xml version=\"1.0\"?><methodCall><methodName>blogger.newPost</methodName><params>";
+    string output = header;
     // get values for wordpress
     if (cms == "wordpress") {
         output += "<param><value><string/></value></param><param><value><string/></value></param>";
-        output += credentials;
+        output += build_credentials();
         output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;&#60;category&#62;"+ categories+ "&#60;/category&#62;<![CDATA["+ body+ "]]></string></value></param>";
     }
     // get values for drupal
     else if (cms == "drupal") {
         output += "<param><value><string/></value></param><param><value><string>"+ content_type+ "</string></value></param>";
-        output += credentials;
+        output += build_credentials();
         output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;<![CDATA["+ body+ "]]></string></value></param>";
     }
     // get values for joomla
     else if (cms == "joomla") {
         output += "<param><value><string/></value></param><param><value><string>"+ llGetSubString(categories, 0, 1)+ "</string></value></param>";
-        output += credentials;
+        output += build_credentials();
         output += "<param><value><string>&#60;title&#62;"+ title+ "&#60;/title&#62;<![CDATA["+ body+ "]]></string></value></param>";
     }
     // close the message
-    output += "<param><value><boolean>"+ publish_status+ "</boolean></value></param>"
-                + "</params></methodCall>";
+    output += build_footer();
     return output;
+}
+drupal_add_taxonomy(string post_id) {
+    string output = "<?xml version=\"1.0\"?><methodCall><methodName>mt.setPostCategories</methodName><params>";
+    // output += "<param><value><boolean/></value></param>";
+    output += "<param><value><string>"+ post_id+ "</string></value></param>";
+    output += build_credentials();
+    // build categories
+    string cats = "<param><array><data>";
+    list cats_list = llCSV2List(categories);
+    integer cats_count = llGetListLength(cats_list);
+    integer i;
+    for (i=0; i<cats_count; ++i) {
+      cats += "<value><categoryId><string>"+ llList2String(cats_list, i)+ "</string></categoryId></value>";
+    }
+    cats += "</data></array></param>";
+    if (cats_count > 0) {
+      output += cats;
+    }
+    output += "</params></methodCall>";
+    reqid = llHTTPRequest( url+"/xmlrpc.php", [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], output );
+    categories = "0";
 }
 key reqid;
 // delete inventory content
@@ -150,32 +177,62 @@ delete_content(integer delete_notecard) {
         }
     }
 }
+string drupal_post_id = "";
 // get the answer
 get_site_answer(string body) {
     list data = llParseString2List(body, ["/>","<", ">"], []);
     string output = "";
     integer success = FALSE;
     if (cms == "wordpress") {
-        display_answer(data, 27, 32, 11, "/?p=");
+        display_answer(check_answer(data, 27, 32, 11), "/?p=");
     }
     else if (cms == "drupal") {
-        display_answer(data, 27, 32, 10, "/?q=node/");
+        string drupal_answer = check_answer(data, 27, 32, 10);
+        if (categories != "0") {
+            if (posted_success) {
+                drupal_post_id = drupal_answer;
+                drupal_add_taxonomy(drupal_answer);
+            }
+            else {
+                display_answer(drupal_answer, "/?q=node/");
+            }
+        }
+        else {
+            if (drupal_post_id != "" && posted_success) {
+                drupal_answer = drupal_post_id;
+                drupal_post_id = "";
+            }
+            display_answer(drupal_answer, "/?q=node/");
+        }
     }
     else if (cms == "joomla") {
-        display_answer(data, 25, 30, 10, "/index.php?option=com_content&view=article&id=");
+        display_answer(check_answer(data, 25, 30, 10), "/index.php?option=com_content&view=article&id=");
     }
 }
-// display answer from server
-display_answer(list data, integer error_idx, integer msg_idx, integer id_idx, string url_str) {
+// check if the message was posted
+integer posted_success = FALSE;
+string check_answer(list data, integer error_idx, integer msg_idx, integer id_idx) {
     if (llList2String(data, error_idx) == "faultString") {
-        llOwnerSay(_POST_FAILED+ " \n"+ _SERVER_ANSWERED+ " : "+ llList2String(data, msg_idx));
+        posted_success = FALSE;
+        return llList2String(data, msg_idx);
     }
     else {
         string id = llList2String(data, id_idx);
-        llOwnerSay(_POST_SUCCEEDED+ " "+ _POST_ID+ " = "+ id);
-        llOwnerSay(url+ url_str+ id);
-        llLoadURL(owner, title, url+ url_str+ id);
+        posted_success = TRUE;
+        return id;
     }
+}
+// display answer from server
+display_answer(string answer, string url_str) {
+    if (posted_success) {
+        llOwnerSay(_POST_SUCCEEDED+ " "+ _POST_ID+ " = "+ answer);
+        llOwnerSay(url+ url_str+ answer);
+        llLoadURL(owner, title, url+ url_str+ answer);
+    }
+    else {
+        llOwnerSay(_POST_FAILED+ " \n"+ _SERVER_ANSWERED+ " : "+ answer);
+    }
+    posted_success = FALSE;
 }
 // get server answer
 getServerAnswer(integer status, string body) {
