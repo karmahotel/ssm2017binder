@@ -135,25 +135,36 @@ string get_body() {
     return output;
 }
 drupal_add_taxonomy(string post_id) {
-    string output = "<?xml version=\"1.0\"?><methodCall><methodName>mt.setPostCategories</methodName><params>";
-    // output += "<param><value><boolean/></value></param>";
-    output += "<param><value><string>"+ post_id+ "</string></value></param>";
-    output += build_credentials();
-    // build categories
-    string cats = "<param><array><data>";
-    list cats_list = llCSV2List(categories);
-    integer cats_count = llGetListLength(cats_list);
-    integer i;
-    for (i=0; i<cats_count; ++i) {
-      cats += "<value><categoryId><string>"+ llList2String(cats_list, i)+ "</string></categoryId></value>";
-    }
-    cats += "</data></array></param>";
-    if (cats_count > 0) {
-      output += cats;
-    }
-    output += "</params></methodCall>";
-    reqid = llHTTPRequest( url+"/xmlrpc.php", [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], output );
-    categories = "0";
+   string output = "<?xml version=\"1.0\"?><methodCall><methodName>mt.setPostCategories</methodName><params>";
+   // output += "<param><value><boolean/></value></param>";
+   output += "<param><value><string>"+ post_id+ "</string></value></param>";
+   output += build_credentials();
+   // build categories
+   string cats = "<param><value><array><data>";
+   list cats_list = llCSV2List(categories);
+   integer cats_count = llGetListLength(cats_list);
+   integer i;
+   for (i=0; i<cats_count; ++i) {
+     // cats += "<value><categoryId><string>"+ llList2String(cats_list, i)+ "</string></categoryId></value>";
+       cats += make_drupal_category_value(llList2String(cats_list, i));
+   }
+   cats += "</data></array></value></param>";
+   if (cats_count > 0) {
+     output += cats;
+   }
+   output += "</params></methodCall>";
+   reqid = llHTTPRequest( url+"/xmlrpc.php", [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], output );
+   categories = "0";
+}
+string make_drupal_category_value(string cat) {
+   return tag("value",
+              tag("struct",
+                  tag("member",
+                      tag("name", "categoryId") +
+                      tag("value", tag("string", cat)))));
+}
+string tag(string tag_name, string content) {
+   return "<" + tag_name + ">" + content + "</" + tag_name + ">";
 }
 key reqid;
 // delete inventory content
